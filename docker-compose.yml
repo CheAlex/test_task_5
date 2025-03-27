@@ -1,0 +1,63 @@
+version: "3.5"
+
+services:
+  nginx:
+    image: nginx:1.27.4-alpine
+    container_name: crypto-balance-monitor_nginx
+    volumes:
+      - ./:/var/task
+      - ./docker/nginx/:/etc/nginx/conf.d/
+    ports:
+      - "8080:80"
+      - "443:443"
+    depends_on:
+      - php-fpm
+    networks:
+      - crypto-balance-monitor
+
+  php-fpm:
+    container_name: crypto-balance-monitor_php-fpm
+    build:
+      context: ./docker/php-fpm
+    depends_on:
+      - mysql
+    volumes:
+      - ./:/var/task
+    working_dir: /var/task
+    networks:
+      - crypto-balance-monitor
+
+  php-cli:
+    tty: true
+    container_name: crypto-balance-monitor_php-cli
+    build:
+      context: ./docker/php
+    depends_on:
+      - mysql
+    volumes:
+      - ./:/var/task
+    working_dir: /var/task
+    networks:
+      - crypto-balance-monitor
+
+  mysql:
+    image: mysql:8.4.4
+    container_name: crypto-balance-monitor_mysql
+    command: --character-set-server=utf8mb4 --collation-server=utf8mb4_unicode_ci
+    ports:
+      - "3307:3306"
+    volumes:
+      - crypto-balance-monitor_mysql:/var/lib/mysql
+    environment:
+      MYSQL_ROOT_PASSWORD: 'root'
+      MYSQL_DATABASE: 'crypto-balance-monitor'
+      MYSQL_USER: 'crypto-balance-monitor'
+      MYSQL_PASSWORD: 'crypto-balance-monitor'
+    networks:
+      - crypto-balance-monitor
+
+networks:
+  crypto-balance-monitor:
+
+volumes:
+  crypto-balance-monitor_mysql: ~
