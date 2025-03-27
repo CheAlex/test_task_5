@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\Providers;
 
+use App\Service\WalletBalanceProvider\BlockchairWalletBalanceProvider;
 use App\Service\WalletBalanceProvider\EtherScanWalletBalanceProvider;
 use App\Service\WalletBalanceProvider\WalletBalanceProviderComposite;
 use App\Service\WalletBalanceProvider\WalletBalanceProviderInterface;
@@ -21,6 +22,7 @@ class AppServiceProvider extends ServiceProvider
     public function register(): void
     {
         $this->app->tag([EtherScanWalletBalanceProvider::class], 'app.wallet_balance_provider');
+        $this->app->tag([BlockchairWalletBalanceProvider::class], 'app.wallet_balance_provider');
 
         $this->app->when(WalletBalanceProviderComposite::class)
             ->needs('$walletBalanceProviders')
@@ -29,6 +31,10 @@ class AppServiceProvider extends ServiceProvider
         $this->app->when(EtherScanWalletBalanceProvider::class)
             ->needs('$apiKey')
             ->give(env('ETHERSCAN_API_KEY'));
+
+        $this->app->when(BlockchairWalletBalanceProvider::class)
+            ->needs('$apiKey')
+            ->give(env('BLOCKCHAIR_API_KEY'));
 
         $this->app->bind(RequestFactoryInterface::class, HttpFactory::class);
         $this->app->bind(ClientInterface::class, Client::class);

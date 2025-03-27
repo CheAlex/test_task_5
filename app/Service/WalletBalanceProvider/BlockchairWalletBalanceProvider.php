@@ -46,12 +46,12 @@ readonly class BlockchairWalletBalanceProvider implements WalletBalanceProviderI
             '%s/%s/dashboards/address/%s?key=%s',
             self::API_URL,
             $network,
-            $walletAddress->getAddress(),
+            $wallet->getAddress(),
             $this->apiKey
         );
 
         $response = $this->sendRequest($url);
-        $balanceKey = sprintf('data.%s.address.balance', $walletAddress->getAddress());
+        $balanceKey = sprintf('data.%s.address.balance', $wallet->getAddress());
 
         if (!ArrayUtil::hasByPath($response, $balanceKey)) {
             throw new WalletBalanceProviderException('Invalid Blockchair response data.');

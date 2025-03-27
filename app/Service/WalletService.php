@@ -40,7 +40,6 @@ readonly class WalletService
             }
 
             $this->walletBalanceService->updateWalletBalance($wallet);
-
             $this->connectionInterface->commit();
         } catch (\Throwable $exception) {
             $this->connectionInterface->rollBack();
